@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const html = document.documentElement;
 
     // Check saved preference
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     html.setAttribute('data-theme', savedTheme);
 
     themeToggle.addEventListener('click', () => {
