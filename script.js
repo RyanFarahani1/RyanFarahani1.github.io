@@ -43,7 +43,67 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+    // ==================== IMAGE CAPTIONING DEMO ====================
+    const captionInput = document.getElementById('captionImageInput');
+    const captionPreview = document.getElementById('captionImagePreview');
+    const captionBtn = document.getElementById('captionSubmitBtn');
+    const captionStatus = document.getElementById('captionStatus');
+    const captionResult = document.getElementById('captionResult');
 
+    const CAPTION_API_URL = 'https://ryanfafa-image-captioning-model.hf.space/caption';
+
+    if (captionInput && captionBtn) {
+        // Show preview when an image is selected
+        captionInput.addEventListener('change', () => {
+            const file = captionInput.files[0];
+            captionResult.textContent = '';
+            if (!file) {
+                captionPreview.style.display = 'none';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                captionPreview.src = e.target.result;
+                captionPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        captionBtn.addEventListener('click', async () => {
+            const file = captionInput.files[0];
+            if (!file) {
+                captionStatus.textContent = 'Please choose an image first.';
+                return;
+            }
+
+            captionStatus.textContent = 'Generating caption...';
+            captionResult.textContent = '';
+            captionBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const resp = await fetch(CAPTION_API_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!resp.ok) {
+                    throw new Error(`HTTP ${resp.status}`);
+                }
+
+                const data = await resp.json();
+                captionResult.textContent = data.caption || '(No caption returned)';
+                captionStatus.textContent = '';
+            } catch (err) {
+                console.error(err);
+                captionStatus.textContent = 'Error generating caption. Please try again.';
+            } finally {
+                captionBtn.disabled = false;
+            }
+        });
+    }
     // ==================== TYPING EFFECT ====================
     const typedElement = document.getElementById('typedText');
     const titles = [
